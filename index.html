@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
   <head>
     <meta charset="utf-8" />
-    <title>Ionic App</title>
+    <title>Students Fest</title>
 
     <base href="/" />
 
@@ -14,17 +14,59 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
 
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <link rel="shortcut icon" href="/assets/favicon.png" />
 
     <!-- add to homescreen for ios -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Ionic App" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-  </head>
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- add bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
+    <!-- fontawesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- midtrans -->
+    <!-- <script type="text/javascript"
+		src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="SB-Mid-client-jC3ZVwGB6Ql_kWGM"></script> -->
+    
+    <script type="text/javascript"
+		src="https://app.midtrans.com/snap/snap.js"
+    data-client-key="Mid-client-lRhqVRnml6mFeevv"></script>
+  </head>
+  
   <body>
+    <div class="blobs">
+      <!-- <img src="/assets/images/bg-1.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-2.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-3.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-4.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-5.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-6.jpg" alt="" class="blobs_background"> -->
+      <!-- <img src="/assets/images/bg-7.jpg" alt="" class="blobs_background"> -->
+      <img src="/assets/images/bg-8.jpg" alt="" class="blobs_background">
+    </div>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    <script>
+      // Fungsi untuk mendeteksi dan mengatur tema berdasarkan system preferences
+      const updateTheme = () => {
+        const isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-bs-theme", isDarkMode ? "dark" : "light");
+      };
+
+      // Deteksi perubahan pada system preferences
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", updateTheme);
+
+      // Set tema saat pertama kali halaman dimuat
+      updateTheme();
+    </script>
   </body>
 
 </html>

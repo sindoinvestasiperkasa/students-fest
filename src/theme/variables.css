@@ -1,2 +1,68 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+
+.blobs {
+  z-index: -1;
+  position: fixed;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.blobs_background {
+  position: absolute;
+  display: block;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-position: center center;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: .5;
+  /* transition: opacity 2s ease-in-out; */
+  filter: brightness(1.5);
+}
+
+/* Gradient Button Styling */
+.gradient-btn {
+    background: linear-gradient(to right, #ff0000, #0000ff); /* Gradasi merah ke biru */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+.gradient-btn:hover {
+  transform: translateY(-2px); /* Sedikit naik saat hover */
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.2);
+  color: #dedede;
+}
+
+.gradient-btn:active {
+  transform: scale(0.98); /* Efek klik */
+}
+
+/* Tambahkan garis merah di bawah judul */
+.section-title-wrapper {
+  position: relative;
+}
+
+/* Garis gradient */
+.section-title-wrapper::after {
+  content: "";
+  display: block;
+  width: 100px;
+  height: 3px;
+  background: linear-gradient(to right, #ff0000, #0000ff);
+  margin: 8px auto 0;
+}
