@@ -8,9 +8,26 @@
         <p> <i class="fa-solid fa-calendar-days"></i> &nbsp; {{ formatDate(dataEvent.tanggalPelaksanaan) }}</p>
         <p> <i class="fa-solid fa-location-dot"></i> &nbsp; {{ dataEvent.kota }}</p>
         <p> <i class="fa-solid fa-people-group"></i> &nbsp; {{ Array.isArray(dataEvent.jenjang) ? dataEvent.jenjang.join(', ') : dataEvent.jenjang }}</p>
-        <p class="fw-bold fs-3">{{ formatPrice(dataEvent.harga) }}</p>
-        <RouterLink :to="`/payment/${dataEvent.id}`" class="btn gradient-btn mt-3">Daftar Sekarang</RouterLink>
-      </div>
+ <!-- Menampilkan harga hanya jika ada -->
+ <p v-if="dataEvent.harga && dataEvent.harga > 0" class="fw-bold fs-3">{{ formatPrice(dataEvent.harga) }}</p>
+    
+    <!-- Tombol Daftar yang Mengarahkan ke Halaman Register Sesuai Kategori -->
+    <RouterLink v-if="dataEvent.kategori === 'Singing'" :to="`/register/singing/${dataEvent.id}`" class="btn gradient-btn mt-3">
+      Daftar Singing Competition
+    </RouterLink>
+
+    <RouterLink v-else-if="dataEvent.kategori === 'E-Sports'" :to="`/register/e-sports/${dataEvent.id}`" class="btn gradient-btn mt-3">
+      Daftar E-sport Tournament
+    </RouterLink>
+
+    <RouterLink v-else-if="dataEvent.kategori === 'SOC'" :to="`/register/soc/${dataEvent.id}`" class="btn gradient-btn mt-3">
+      Daftar Student Online Competition
+    </RouterLink>
+
+    <RouterLink v-else-if="dataEvent.kategori === 'Mewarnai'" :to="`/register/mewarnai/${dataEvent.id}`" class="btn gradient-btn mt-3">
+      Daftar Drawing Competition
+    </RouterLink>
+        </div>
     </div>
   </template>
   

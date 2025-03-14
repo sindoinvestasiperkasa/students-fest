@@ -27,6 +27,24 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/EventDetailView.vue'),
   },
   {
+    path: '/register/singing/:id',
+    component: () => import('@/views/register/RegisterSingingView.vue')
+  },
+  {
+    path: '/register/e-sports/:id',
+    component: () => import('@/views/register/RegisterEsportView.vue')
+  },
+  {
+    path: '/register/soc/:id',
+    component: () => import('@/views/register/RegisterSOCView.vue')
+  },
+  {
+    path: '/register/mewarnai/:id',
+    component: () => import('@/views/register/RegisterMewarnaiView.vue')
+  },
+  
+
+  {
     path: '/payment/:id',
     name: 'Payment',
     component: () => import('@/views/PaymentView.vue'),

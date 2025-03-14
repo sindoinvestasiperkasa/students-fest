@@ -58,11 +58,11 @@
           <div class="form-group mb-2">
             <select
               class="form-select"
-              v-model="formSekolah.provinsi"
+              v-model="selectedProvinsi"
             >
               <option value="" disabled selected>Provinsi</option>
-              <option v-for="provinsi in dataProvinsi" :key="provinsi.id" :value="provinsi.id">
-                {{ provinsi.nama }}
+              <option v-for="provinsi in provinsi" :key="provinsi.id" :value="provinsi.propinsi">
+                {{ provinsi.propinsi }}
               </option>
             </select>
             <small class="text-danger">{{ errors.provinsi }}</small>
@@ -72,11 +72,11 @@
           <div class="form-group mb-2">
             <select
               class="form-select"
-              v-model="formSekolah.kota"
+              v-model="selectedKota"
             >
               <option value="" disabled selected>Kota / Kab</option>
-              <option v-for="kota in dataKota" :key="kota.id" :value="kota.id">
-                {{ kota.nama }}
+              <option v-for="kota in kotaList" :key="kota.id" :value="kota.kabupaten_kota">
+                {{ kota.kabupaten_kota }}
               </option>
             </select>
             <small class="text-danger">{{ errors.kota }}</small>
@@ -86,11 +86,11 @@
           <div class="form-group mb-2">
             <select
               class="form-select"
-              v-model="formSekolah.kecamatan"
+              v-model="selectedKecamatan"
             >
               <option value="" disabled selected>Kecamatan</option>
-              <option v-for="kecamatan in dataKecamatan" :key="kecamatan.id" :value="kecamatan.id">
-                {{ kecamatan.nama }}
+              <option v-for="kecamatan in kecamatanList" :key="kecamatan.id" :value="kecamatan.kecamatan">
+                {{ kecamatan.kecamatan }}
               </option>
             </select>
             <small class="text-danger">{{ errors.kecamatan }}</small>
@@ -153,6 +153,41 @@
         </div>
       </div>
 
+      <div class="card mt-4" v-if="dataEvent.kategori == 'Singing'">
+        <div class="card-header">
+          <b>Informasi Lagu</b>
+        </div>
+        <div class="card-body">
+          <div class="form-group mb-2">
+            <input
+              v-model="formLagu.judulLagu"
+              type="text"
+              class="form-control"
+              placeholder="Judul Lagu"
+              required
+            />
+          </div>
+          <div class="form-group mb-2">
+            <input
+              v-model="formLagu.penyanyiAsli"
+              type="text"
+              class="form-control"
+              placeholder="Penyanyi Asli"
+              required
+            />
+          </div>
+          <div class="form-group mb-2">
+            <input
+              v-model="formLagu.videoLink"
+              type="url"
+              class="form-control"
+              placeholder="Link YouTube / Google Drive"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
       <div class="card mt-4">
         <div class="card-header">
           <b>Data Akun</b>
@@ -182,9 +217,9 @@
 <script setup>
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import FooterComponent from '@/components/FooterComponent.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { db, auth } from './../../firebaseConfig.js';
+import { db, auth, db2 } from './../../firebaseConfig.js';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, getDoc, addDoc, collection, getDocs, query, orderBy, getCountFromServer, writeBatch, where } from 'firebase/firestore';
 
@@ -215,6 +250,13 @@ const formDiri = ref({
   gender: '',
   alamat: '',
 });
+
+// Form Data Lagu
+const formLagu = ref({
+  judulLagu: '',
+  penyanyiAsli: '',
+  videoLink: '',
+})
 
 // Form Data Sekolah
 const formSekolah = ref({
@@ -264,38 +306,74 @@ const countDocuments = async () => {
 };
 
 // Computed properties for dropdown options
-const dataProvinsi = computed(() => {
-  const provinsiSet = new Set(dataSekolah.value.map(item => item.propinsi));
-  return Array.from(provinsiSet).map(provinsi => ({
-    id: provinsi,
-    nama: provinsi
-  }));
+// const dataProvinsi = computed(() => {
+//   const provinsiSet = new Set(dataSekolah.value.map(item => item.propinsi));
+//   return Array.from(provinsiSet).map(provinsi => ({
+//     id: provinsi,
+//     nama: provinsi
+//   }));
+// });
+
+// const dataKota = computed(() => {
+//   if (!formSekolah.value.provinsi) return [];
+//   const kotaSet = new Set(
+//     dataSekolah.value
+//       .filter(item => item.propinsi === formSekolah.value.provinsi)
+//       .map(item => item.kabupaten_kota)
+//   );
+//   return Array.from(kotaSet).map(kota => ({
+//     id: kota,
+//     nama: kota
+//   }));
+// });
+
+// const dataKecamatan = computed(() => {
+//   if (!formSekolah.value.kota) return [];
+//   const kecamatanSet = new Set(
+//     dataSekolah.value
+//       .filter(item => item.kabupaten_kota === formSekolah.value.kota)
+//       .map(item => item.kecamatan)
+//   );
+//   return Array.from(kecamatanSet).map(kecamatan => ({
+//     id: kecamatan,
+//     nama: kecamatan
+//   }));
+// });
+
+const provinsi = ref([]);
+const kotaList = ref([]);
+const kecamatanList = ref([]);
+const selectedProvinsi = ref("");
+const selectedKota = ref("");
+const selectedKecamatan = ref("");
+
+const getProvinsi = async () => {
+  try {
+    const q = query(collection(db2, "dataProvinsi"));
+    const querySnapshot = await getDocs(q);
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      provinsi.value.push(data);
+    });
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+}
+
+// get kota by selectedProvince
+watch(selectedProvinsi, async () => {
+  const q = query(collection(db2, "dataKota"), where("propinsi", "==", selectedProvinsi.value));
+  await getDocs(q).then((querySnapshot) => {
+    kotaList.value = querySnapshot.docs.map((doc) => doc.data());
+  });
 });
 
-const dataKota = computed(() => {
-  if (!formSekolah.value.provinsi) return [];
-  const kotaSet = new Set(
-    dataSekolah.value
-      .filter(item => item.propinsi === formSekolah.value.provinsi)
-      .map(item => item.kabupaten_kota)
-  );
-  return Array.from(kotaSet).map(kota => ({
-    id: kota,
-    nama: kota
-  }));
-});
-
-const dataKecamatan = computed(() => {
-  if (!formSekolah.value.kota) return [];
-  const kecamatanSet = new Set(
-    dataSekolah.value
-      .filter(item => item.kabupaten_kota === formSekolah.value.kota)
-      .map(item => item.kecamatan)
-  );
-  return Array.from(kecamatanSet).map(kecamatan => ({
-    id: kecamatan,
-    nama: kecamatan
-  }));
+// get kecamatan by selectedKota
+watch(selectedKota, async () => {
+  const q = query(collection(db2, "dataKecamatan"), where("kabupaten_kota", "==", selectedKota.value));
+  await getDocs(q).then((querySnapshot) => {
+    kecamatanList.value = querySnapshot.docs.map((doc) => doc.data());
+  });
 });
 
 const dataSekolahIndonesia = computed(() => {
@@ -453,6 +531,7 @@ onMounted(() => {
   fetchDataTahunAjaran();
   fetchDataSekolah();
   countDocuments();
+  getProvinsi();
 })
 
 // Fungsi untuk melakukan validasi form
@@ -645,6 +724,9 @@ const payNow = async () => {
                 namaKelas: formKelas.value.namaKelas,
                 password: formAkun.value.password,
                 statusSiswa: 'Siswa',
+                judulLagu: formLagu.value.judulLagu || '',
+                penyanyiAsli: formLagu.value.penyanyiAsli || '',
+                videoLink: formLagu.value.videoLink || '',
                 createdAt: new Date().toISOString(),
               };
 

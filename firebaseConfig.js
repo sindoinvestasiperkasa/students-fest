@@ -28,9 +28,10 @@ const firebaseConfigRealtime = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig, "sindo-ip");
 const db = getFirestore(app, "studentsfest");
+const db2 = getFirestore(app, "sindo-lms");
 const auth = getAuth(app);
 
 const appRealtime = initializeApp(firebaseConfigRealtime, "sosro-fest");
 const dbRealtime = getDatabase(appRealtime);
 
-export { db, auth, dbRealtime };
+export { db, auth, dbRealtime, db2 };
