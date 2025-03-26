@@ -45,8 +45,8 @@
             <img src="/assets/images/SF-6A.jpg" class="card-img-top" alt="...">
             <div class="card-body d-flex flex-column">
               <h5 class="card-title mb-2">MEWARNAI</h5>
-              <p class="card-text flex-grow-1">Pertandingan Badminton untuk Jenjang 
-                SD, SMP, & SMA.
+              <p class="card-text flex-grow-1">Lomba mewarnai untuk Jenjang 
+                SD.
               </p>
             </div>
           </div>
