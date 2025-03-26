@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getDatabase } from "firebase/database";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDkv5w5JoaALm7RZ_tsz6loIYQixAEKeoE",
@@ -30,8 +31,10 @@ const app = initializeApp(firebaseConfig, "sindo-ip");
 const db = getFirestore(app, "studentsfest");
 const db2 = getFirestore(app, "sindo-lms");
 const auth = getAuth(app);
+const storage = getStorage(app);
 
 const appRealtime = initializeApp(firebaseConfigRealtime, "sosro-fest");
+const auth2 = getAuth(appRealtime);
 const dbRealtime = getDatabase(appRealtime);
 
-export { db, auth, dbRealtime, db2 };
+export { db, auth, auth2, dbRealtime, db2, storage, app, appRealtime };

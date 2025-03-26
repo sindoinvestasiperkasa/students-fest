@@ -15,7 +15,7 @@
       </div>
       <div class="card">
         <div class="card-header">
-          <b>Data Diri</b>
+          <b>Data Diri Peserta</b>
         </div>
         <div class="card-body">
           <div class="form-group mb-2">
@@ -41,6 +41,11 @@
               <option value="perempuan">Perempuan</option>
             </select>
             <small class="text-danger">{{ errors.gender }}</small>
+          </div>
+          <div class="form-group mb-2">
+            <label for="formFileSm" class="form-label">Upload Kartu Pelajar</label>
+            <input class="form-control form-control-sm" id="formFileSm" type="file" @change="handleFileUpload">
+            <img v-if="uploadedImage" :src="uploadedImage" alt="Preview" width="200">
           </div>
           <div class="form-group mb-2">
             <textarea v-model="formDiri.alamat" type="text" class="form-control" placeholder="Alamat" required></textarea>
@@ -114,15 +119,7 @@
 
           <!-- Sekolah -->
           <div class="form-group mb-2">
-            <select
-              class="form-select"
-              v-model="formSekolah.sekolah"
-            >
-              <option value="" disabled selected>Sekolah</option>
-              <option v-for="sekolah in dataSekolahIndonesia" :key="sekolah.id" :value="sekolah.sekolah">
-                {{ sekolah.sekolah }}
-              </option>
-            </select>
+            <input v-model="formSekolah.sekolah" type="text" class="form-control" placeholder="Nama Sekolah" required />
             <small class="text-danger">{{ errors.sekolah }}</small>
           </div>
         </div>
@@ -188,6 +185,23 @@
         </div>
       </div>
 
+      <div class="card mt-4" v-if="dataEvent.kategori == 'E-Sports'">
+        <div class="card-header">
+          <b>Informasi Tim</b>
+        </div>
+        <div class="card-body">
+          <div class="form-group mb-2">
+            <input
+              v-model="formTim.namaTim"
+              type="text"
+              class="form-control"
+              placeholder="Nama Tim"
+              required
+            />
+          </div>
+        </div>
+      </div>
+
       <div class="card mt-4">
         <div class="card-header">
           <b>Data Akun</b>
@@ -219,9 +233,10 @@ import HeaderComponent from '@/components/HeaderComponent.vue';
 import FooterComponent from '@/components/FooterComponent.vue';
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { db, auth, db2 } from './../../firebaseConfig.js';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { db, auth, auth2, db2, app } from './../../firebaseConfig.js';
+import { createUserWithEmailAndPassword, fetchSignInMethodsForEmail } from 'firebase/auth';
 import { doc, getDoc, addDoc, collection, getDocs, query, orderBy, getCountFromServer, writeBatch, where } from 'firebase/firestore';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const route = useRoute();
 const router = useRouter();
@@ -229,7 +244,7 @@ const router = useRouter();
 const eventId = ref(route.params.id);
 const dataEvent = ref({});
 const dataSekolah = ref([]);
-console.log(dataSekolah);
+console.log("dataSekolah", dataSekolah.value);
 
 
 // const dataProvinsi = ref([]);
@@ -249,6 +264,7 @@ const formDiri = ref({
   phone: '',
   gender: '',
   alamat: '',
+  kartu_pelajar: '',
 });
 
 // Form Data Lagu
@@ -280,6 +296,11 @@ const formAkun = ref({
   konfirmasiPassword: '',
 });
 
+// Form Data Tim
+const formTim = ref({
+  namaTim: '',
+});
+
 // Validasi
 const errors = ref({
   first_name: "",
@@ -298,6 +319,19 @@ const errors = ref({
   password: "",
   konfirmasiPassword: ""
 });
+
+const uploadedImage = ref("");
+
+async function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const storage = getStorage(app);
+    const storageReference = storageRef(storage, `kartuPelajar/${file.name}`);
+    await uploadBytes(storageReference, file);
+    const imageURL = await getDownloadURL(storageReference);
+    uploadedImage.value = imageURL;
+  }
+};
 
 const countDocuments = async () => {
   const colRef = collection(db, "dataSekolah"); // Ganti "namaKoleksi" dengan nama koleksi Anda
@@ -377,7 +411,11 @@ watch(selectedKota, async () => {
 });
 
 const dataSekolahIndonesia = computed(() => {
-  const { kecamatan, jenjang } = formSekolah.value;
+  const kecamatan = selectedKecamatan.value;
+  const jenjang = formSekolah.value.jenjang;
+
+  console.log(kecamatan, jenjang);
+  
 
   // Jika kecamatan atau jenjang tidak dipilih, kembalikan array kosong
   if (!kecamatan || !jenjang) return [];
@@ -528,8 +566,8 @@ const fetchDataTingkatKelas = async (jenjangId) => {
 onMounted(() => {
   fetchdataEvent();
   fetchDataJenjang();
+  // fetchDataSekolah();
   fetchDataTahunAjaran();
-  fetchDataSekolah();
   countDocuments();
   getProvinsi();
 })
@@ -570,15 +608,15 @@ const validateForm = () => {
   }
 
   // Validasi data sekolah
-  if (!formSekolah.value.provinsi) {
+  if (!selectedProvinsi) {
     errors.value.provinsi = "Provinsi wajib dipilih.";
     isValid = false;
   }
-  if (!formSekolah.value.kota) {
+  if (!selectedKota) {
     errors.value.kota = "Kota wajib dipilih.";
     isValid = false;
   }
-  if (!formSekolah.value.kecamatan) {
+  if (!selectedKecamatan) {
     errors.value.kecamatan = "Kecamatan wajib dipilih.";
     isValid = false;
   }
@@ -587,7 +625,7 @@ const validateForm = () => {
     isValid = false;
   }
   if (!formSekolah.value.sekolah) {
-    errors.value.sekolah = "Sekolah wajib dipilih.";
+    errors.value.sekolah = "Sekolah wajib diisi.";
     isValid = false;
   }
 
@@ -626,13 +664,13 @@ const payNow = async () => {
     }
 
     // Kirim request ke backend untuk mendapatkan transaction token
-    const response = await fetch('http://localhost:3001/api/payment', {
+    const response = await fetch('https://sindo-midtrans.up.railway.app/api/payment', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        orderId: `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+        orderId: `SF-${dataEvent.value.kategori}-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
         amount: dataEvent.value.harga,
         customerDetails: {
           first_name: formDiri.value.first_name,
@@ -690,15 +728,71 @@ const payNow = async () => {
               console.log('Successfully saved payment data:', paymentData);
 
               // Kirim email konfirmasi ke pelanggan
-              const emailResponse = await fetch('http://localhost:3001/api/send-email', {
+              const emailResponse = await fetch('https://sindo-midtrans.up.railway.app/api/send-email', {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                   to: formDiri.value.email,
-                  subject: `Bukti Pembayaran untuk ${dataEvent.value.nama}`,
-                  text: `Halo ${formDiri.value.first_name} ${formDiri.value.last_name},\n\nTerima kasih telah mendaftar di event ${dataEvent.value.nama}.\n\nDetail Diri:\n- Nama Event: ${dataEvent.value.nama}\n- Harga: Rp ${dataEvent.value.harga}\n- ID Pesanan: ${result.order_id}\n- pdf: ${result.pdf_url}\n\nSalam,\nTim SINDO-IP`,
+                  subject: `🎉 Konfirmasi Pembayaran & Invoice – Students Fest 2025 🎟️`,
+                  html: `
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6; margin: 0 20px;">
+                        <img src="https://i.ibb.co.com/sJzjY1K0/favicon.png" alt="Logo Students fest" style="max-width: 200px; margin-bottom: 20px; margin-top: 20px; display: block; margin-left: auto; margin-right: auto;" />
+                        <h3 style="font-weight: bold; margin: 0; text-align: center">Students Fest</h3>
+                        <hr style="width: 100%; border: none; border-top: 2px solid #FF0000; margin: 20px 0;">
+                    </div>
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6; margin: 0 50px;">
+                        <strong>Halo, ${formDiri.value.first_name} ${formDiri.value.last_name},</strong>
+                        <p>Selamat! Kami telah menerima pembayaranmu untuk mengikuti perlombaan <strong>${dataEvent.value.nama}</strong>. Terima kasih telah bergabung dalam event seru ini! 🎊🔥</p>
+                        <p>Terlampir, kami kirimkan <strong>invoice resmi sebagai bukti pembayaran dan pendaftaran</strong>. Simpan baik-baik dokumen ini untuk referensi ke depan.</p>
+
+                        <br>
+
+                        <h4 style="text-align: center; font-weight: bold; margin-bottom: 15px;">Detail Pendaftaran</h4>
+                        <table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; margin: 10px 0; border-radius: 8px; overflow: hidden; border: 1px solid #ddd;">
+                          <thead>
+                              <tr style="background-color: #f4f4f4;">
+                                  <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">ID Pesanan</th>
+                                  <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Nama Event</th>
+                                  <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Kuantitas</th>
+                                  <th style="border: 1px solid #ddd; padding: 12px; text-align: center;">Harga</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              <tr>
+                                  <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">${result.order_id}</td>
+                                  <td style="border: 1px solid #ddd; padding: 12px;">${dataEvent.value.nama}</td>
+                                  <td style="border: 1px solid #ddd; padding: 12px; text-align: center;">1</td>
+                                  <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">Rp.${result.gross_amount}</td>
+                              </tr>
+                          </tbody>
+                          <tfoot>
+                              <tr style="background-color: #f9f9f9; font-weight: bold;">
+                                  <td colspan="3" style="border: 1px solid #ddd; padding: 12px; text-align: right;">Total</td>
+                                  <td style="border: 1px solid #ddd; padding: 12px; text-align: right;">Rp.${result.gross_amount}</td>
+                              </tr>
+                          </tfoot>
+                        </table>
+
+                        <br>
+
+                        <p>Kami sangat antusias menyambutmu di event ini! 🎶✨ Jangan lupa pantau email atau grup peserta untuk update terbaru seputar acara. Jika ada pertanyaan, silakan hubungi kami.</p>
+
+                        <br>
+
+                        <p>
+                            Nomor bantuan & layanan CS:
+                        </p>
+
+                        <p>📩 Kontak Panitia: <a href="https://wa.me/6281220659919">0812-2065-9919</a></p>
+                        <br>
+                        <p>Sampai jumpa di Students Fest! 🚀</p>
+                        <br>
+                        <p>Salam Hangat,</p>
+                        <p><strong>Panitia Students Fest</strong></p>
+                    </div>
+                  `,
                 }),
               });
 
@@ -707,16 +801,21 @@ const payNow = async () => {
               }
 
               console.log('Email sent successfully');
+
+              console.log("uploadedImage.value", uploadedImage.value);
+              
               
               // Simpan data siswa
               const dataSiswa = {
                 nama: formDiri.value.first_name,
                 email: formDiri.value.email,
                 phone: formDiri.value.phone,
+                gender: formDiri.value.gender,
+                kartu_pelajar: uploadedImage.value,
                 alamat: formDiri.value.alamat,
-                provinsi: formSekolah.value.provinsi,
-                kota: formSekolah.value.kota,
-                kecamatan: formSekolah.value.kecamatan,
+                provinsi: selectedProvinsi.value,
+                kota: selectedKota.value,
+                kecamatan: selectedKecamatan.value,
                 jenjang: formSekolah.value.jenjang,
                 sekolah: formSekolah.value.sekolah,
                 tahunAjaran: formKelas.value.tahunAjaran,
@@ -727,11 +826,24 @@ const payNow = async () => {
                 judulLagu: formLagu.value.judulLagu || '',
                 penyanyiAsli: formLagu.value.penyanyiAsli || '',
                 videoLink: formLagu.value.videoLink || '',
+                namaTim: formTim.value.namaTim || '',
                 createdAt: new Date().toISOString(),
               };
 
               const siswaDocRef = collection(db, 'dataSiswa');
               await addDoc(siswaDocRef, dataSiswa);
+
+              const signInMethods = await fetchSignInMethodsForEmail(auth2, formDiri.value.email);
+
+              if (signInMethods.length > 0) {
+                // Jika akun sudah ada, langsung arahkan ke /event
+                console.log("Akun sudah ada, mengarahkan ke /event...");
+                router.push("/event");
+                return;
+              }
+
+              // Jika akun belum ada, buat akun baru
+              await createUserWithEmailAndPassword(auth2, formDiri.value.email, formAkun.value.password);
               await createUserWithEmailAndPassword(auth, formDiri.value.email, formAkun.value.password);
               console.log('Successfully saved siswa data:', dataSiswa);
 
@@ -741,23 +853,8 @@ const payNow = async () => {
             }
           },
           onPending: async function (result) {
-            const emailResponse = await fetch('http://localhost:3001/api/send-email', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  to: formDiri.value.email,
-                  subject: `Tagihan Pembayaran untuk ${dataEvent.value.nama}`,
-                  text: `Halo ${formDiri.value.first_name} ${formDiri.value.last_name},\n\nTerima kasih telah mendaftar di event ${dataEvent.value.nama}.\n\nDetail Diri:\n- Nama Event: ${dataEvent.value.nama}\n- Harga: Rp ${dataEvent.value.harga}\n- ID Pesanan: ${result.order_id}\n- Link Pembayaran: ${result.transactionUrl}\n- Token: ${result.transactionToken}\n\nSalam,\nTim SINDO-IP`,
-                }),
-              });
-
-              if (!emailResponse.ok) {
-                throw new Error(`Failed to send email! Status: ${emailResponse.status}`);
-              }
-
-              console.log('Email sent successfully');
+            console.log('Pending:', result);
+            alert('Payment Pending');
           },
           onError: function (result) {
             console.log('Error:', result);
