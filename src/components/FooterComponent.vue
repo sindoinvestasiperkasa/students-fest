@@ -23,7 +23,7 @@
                             </li>
                             <li class="d-flex gap-2">
                                 <i class="fa-solid fa-phone mt-1"></i>
-                                <p @click="navigateTo('https://wa.me/628117234242')">+628117234242</p>
+                                <p @click="navigateTo('https://wa.me/6281220659919')">+62812-2065-9919</p>
                             </li>
                             <li class="d-flex gap-2">
                                 <i class="fa-solid fa-envelope mt-1"></i>

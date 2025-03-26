@@ -150,6 +150,7 @@
                             <img :src="event.gambar" class="card-img-top" alt="Event Image">
                             <span class="badge text-bg-warning position-absolute top-0 end-0">{{ event.kategori }}</span>
                             <div class="card-body d-flex flex-column">
+                                <span class="badge text-bg-info w-auto px-2 py-1 align-self-start">{{ event.tingkat }}</span>
                                 <h5 class="card-title mb-2 text-uppercase">{{ event.nama }}</h5>
                                 <p class="card-text flex-grow-1">{{ event.deskripsiPendek }}</p>
                                 <div class="row align-items-center">
