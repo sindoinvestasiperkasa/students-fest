@@ -37,8 +37,8 @@
                     <div class="col-12 col-md-6 col-lg-3">
                         <h3>Follow Us</h3>
                         <div class="social-media d-flex gap-3">
-                            <p @click="navigateTo('https://www.instagram.com/sindoinvestasiperkasa/')"><i class="fa-brands fa-instagram fa-xl"></i></p>
-                            <p @click="navigateTo('https://www.tiktok.com/@sindoip')"><i class="fa-brands fa-tiktok fa-xl"></i></p>
+                            <p @click="navigateTo('https://www.instagram.com/students_fest/')"><i class="fa-brands fa-instagram fa-xl"></i></p>
+                            <p @click="navigateTo('https://www.tiktok.com/@studentsfest?_t=ZS-8vLjmZMT1ct&_r=1')"><i class="fa-brands fa-tiktok fa-xl"></i></p>
                             <p @click="navigateTo('https://www.facebook.com/sindoip/')"><i class="fa-brands fa-facebook fa-xl"></i></p>
                         </div>
                     </div>

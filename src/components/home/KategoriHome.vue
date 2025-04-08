@@ -12,7 +12,7 @@
               <h5 class="card-title mb-2">STUDENT ONLINE COMPETITION</h5>
               <p class="card-text flex-grow-1">Cepat tepat menjawab soal online
                 menggunakan HP Untuk Jenjang
-                SD, SMP, & SMA.
+                SD & SMP.
               </p>
             </div>
           </div>
@@ -24,7 +24,7 @@
               <h5 class="card-title mb-2">E-SPORT MOBILE LEGEND</h5>
               <p class="card-text flex-grow-1">Pertandingan Game Online Mobile
                 Legend Antar Grup Untuk Jenjang
-                SD, SMP, & SMA.
+                SD & SMP.
               </p>
             </div>
           </div>

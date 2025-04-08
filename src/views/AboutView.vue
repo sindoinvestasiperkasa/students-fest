@@ -2,28 +2,37 @@
     <HeaderComponent />
         <div class="container">
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-01.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-01.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-02.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-02.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-03.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-03.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-04.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-04.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-05.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-05.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-06.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-06.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-07.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-07.jpg" alt="">
             </div>
             <div class="d-flex justify-content-center">
-                <img src="/assets/images/SF-08.jpg" alt="">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-08.jpg" alt="">
+            </div>
+            <div class="d-flex justify-content-center">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-09.jpg" alt="">
+            </div>
+            <div class="d-flex justify-content-center">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-10.jpg" alt="">
+            </div>
+            <div class="d-flex justify-content-center">
+                <img src="/assets/images/about/Students Fest Proposal Landscape-11.jpg" alt="">
             </div>
         </div>
     <FooterComponent />
