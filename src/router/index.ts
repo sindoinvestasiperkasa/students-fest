@@ -40,6 +40,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/email",
     name: "Email",
     component: () => import("@/views/emailPage.vue")
+  },
+  {
+    path: "/juknis",
+    name: "Juknis",
+    component: () => import("@/views/JuknisView.vue")
   }
 ]
 

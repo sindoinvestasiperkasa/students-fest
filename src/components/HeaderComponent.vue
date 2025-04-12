@@ -50,6 +50,9 @@
                     <li class="nav-item px-0 px-lg-2">
                         <RouterLink to="/gallery" class="nav-link">Gallery</RouterLink>
                     </li>
+                    <li class="nav-item px-0 px-lg-2">
+                        <RouterLink to="/juknis" class="nav-link">Juknis</RouterLink>
+                    </li>
                 </ul>
                 <RouterLink to="/event" class="btn gradient-btn px-3">Daftar Sekarang</RouterLink>
             </div>
