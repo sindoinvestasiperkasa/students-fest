@@ -45,6 +45,11 @@ const routes: Array<RouteRecordRaw> = [
     path: "/juknis",
     name: "Juknis",
     component: () => import("@/views/JuknisView.vue")
+  },
+  {
+    path: "/list-peserta",
+    name: "ListPeserta",
+    component: () => import("@/views/ListPesertaView.vue")
   }
 ]
 
