@@ -113,6 +113,7 @@
               <option value="SMP">SMP</option>
               <option value="SMA">SMA</option>
               <option value="SMK">SMK</option>
+              <option value="Guru">Guru</option>
             </select>
             <small class="text-danger">{{ errors.jenjang }}</small>
           </div>
