@@ -46,6 +46,7 @@
                             <th scope="col">Nama</th>
                             <th scope="col">Email</th>
                             <th scope="col">No. Telpon</th>
+                            <th scope="col">Jenjang</th>
                             <th scope="col">Nama Lomba</th>
                             <th scope="col">Kategori Lomba</th>
                             <th scope="col">Waktu Pembayaran</th>
@@ -58,6 +59,7 @@
                             <td>{{ data.pembayaran.firstName }} {{ data.pembayaran.lastName }}</td>
                             <td>{{ data.pembayaran.email }}</td>
                             <td>{{ data.pembayaran.phone }}</td>
+                            <td>{{ data.jenjang }}</td>
                             <td>{{ data.pembayaran.eventName }}</td>
                             <td>{{ data.kategoriLomba.kategoriLomba }}</td>
                             <td>{{ new Date(data.pembayaran.transactionTime).toLocaleString() }}</td>
@@ -127,67 +129,62 @@ const pembayaran = async () => {
 
 const fetchDataPeserta = async () => {
     try {
-        // Ambil semua peserta
         const pesertaQuery = query(collection(db, 'dataSiswa'));
         const pesertaSnapshot = await getDocs(pesertaQuery);
 
-        // Mapping peserta untuk mengambil email
         const pesertaData = await Promise.all(
             pesertaSnapshot.docs.map(async (pesertaDoc) => {
                 const peserta = { id: pesertaDoc.id, ...pesertaDoc.data() };
 
-                // 1️⃣ Cari data pembayaran berdasarkan email peserta
+                // Ambil data pembayaran berdasarkan email
                 const pembayaranQuery = query(
                     collection(db, 'pembayaran'),
                     where('email', '==', peserta.email)
                 );
                 const pembayaranSnapshot = await getDocs(pembayaranQuery);
 
-                // Ambil data pembayaran jika ada
-                const pembayaranData = pembayaranSnapshot.docs.map((p) => ({
-                    id: p.id,
-                    ...p.data()
-                }));
+                // Ambil semua pembayaran dan urutkan dari yang terbaru
+                const pembayaranData = pembayaranSnapshot.docs
+                    .map((p) => ({
+                        id: p.id,
+                        ...p.data()
+                    }))
 
-                // Pilih pembayaran pertama jika ada
+                // Ambil pembayaran terbaru
                 const pembayaran = pembayaranData.length > 0 ? pembayaranData[0] : null;
 
-                // 2️⃣ Cari data kategori lomba berdasarkan **eventId** (Document ID)
+                // Ambil data kategori lomba jika ada eventId
                 let kategoriLomba = null;
-
                 if (pembayaran?.eventId) {
                     try {
-                        console.log("eventId:", pembayaran.eventId);
-
-                        // Ambil dokumen berdasarkan eventId sebagai document ID
                         const kategoriDocRef = doc(db, "dataEvent", pembayaran.eventId);
                         const kategoriDocSnap = await getDoc(kategoriDocRef);
-
                         if (kategoriDocSnap.exists()) {
-                            kategoriLomba = { id: kategoriDocSnap.id, kategoriLomba: kategoriDocSnap.data().kategori };
-                        } else {
-                            console.warn("Document kategoriLomba tidak ditemukan:", pembayaran.eventId);
+                            kategoriLomba = {
+                                id: kategoriDocSnap.id,
+                                kategoriLomba: kategoriDocSnap.data().kategori,
+                            };
                         }
                     } catch (err) {
                         console.error("Error fetching kategoriLomba:", err);
                     }
                 }
 
-                // Gabungkan data peserta dengan pembayaran dan kategori lomba
                 return {
                     ...peserta,
-                    pembayaran, // Data pembayaran (bisa null)
-                    kategoriLomba, // Data kategori lomba (bisa null)
+                    pembayaran,
+                    kategoriLomba,
                 };
             })
         );
 
-        // Simpan hasil ke variabel dataPeserta
+        // Simpan ke variabel utama
         dataPeserta.value = pesertaData;
     } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching data peserta:", error);
     }
 };
+
 
 const filteredPeserta = computed(() => {
   return dataPeserta.value.filter((event) => {
@@ -200,7 +197,7 @@ const filteredPeserta = computed(() => {
 
     if (
       searchQuery.value &&
-      !(`${event.pembayaran?.firstName || ''} ${event.pembayaran?.lastName || ''} ${event.pembayaran?.email || ''}`
+      !(`${event.pembayaran?.firstName || ''} ${event.pembayaran?.lastName || ''} ${event.pembayaran?.email || ''} ${event.jenjang || ''}`
         .toLowerCase()
         .includes(searchQuery.value.toLowerCase()))
     ) {

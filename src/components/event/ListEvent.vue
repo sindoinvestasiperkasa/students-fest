@@ -170,7 +170,14 @@
                                     </div>
                                 </div>
                                 <p class="fw-bold mt-2">{{ convertToRupiah(event.harga) }}</p>
-                                <RouterLink :to="`/event/${event.id}`" class="btn gradient-btn mt-auto">Lihat Detail</RouterLink>
+                                <div>
+                                    <template v-if="!isPendaftaranDitutup(event.akhirPendaftaran)">
+                                    <RouterLink :to="`/event/${event.id}`" class="btn gradient-btn mt-auto">Lihat Detail</RouterLink>
+                                    </template>
+                                    <template v-else>
+                                    <button class="btn btn-secondary mt-auto" disabled>Pendaftaran Ditutup</button>
+                                    </template>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -212,6 +219,11 @@ const filters = ref({
 const searchQuery = ref('');
 
 const route = useRoute();
+
+const isPendaftaranDitutup = (akhirPendaftaran) => {
+  const waktu = akhirPendaftaran?.toDate ? akhirPendaftaran.toDate() : new Date(akhirPendaftaran);
+  return waktu < new Date(); // sekarang
+};
 
 const convertToDateInputFormat = (timestamp) => {
   // Konversi dari Firestore Timestamp ke objek Date
